@@ -73,7 +73,7 @@ pub async fn check(request: HttpRequest, bytes: web::Bytes) -> HttpResponse {
         Ok(p) => p,
         Err(e) => return e
     };
-    proxy(request, Method::POST, provider.url("/auth/check"), bytes)
+    proxy(request, Method::GET, provider.url("/auth/check"), bytes)
 }
 
 pub async fn refresh(request: HttpRequest, bytes: web::Bytes) -> HttpResponse {
