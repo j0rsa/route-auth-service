@@ -1,0 +1,116 @@
+version: "3.8"
+services:
+  consul:
+    image: consul
+    ports:
+      - 8500:8500
+    networks:
+      public:
+      micronet:
+        aliases:
+          - consul
+
+#  route:
+#    image: route
+#    ports:
+#      - 8080:8080
+#    networks:
+#      public:
+#      micronet:
+#        aliases:
+#          - route
+
+#  db:
+#    image: postgres
+#
+#  internal:
+#    depends_on:
+#      - db
+#    image: j0rsa/jwt-auth
+#    ports:
+#      - 8080:8080
+#    networks:
+#      micronet:
+#        aliases:
+#          - internal
+#
+#  internal_registrar:
+#    depends_on:
+#      - consul
+#    image: j0rsa/consul-registrar:latest
+#    environment:
+#      CONSUL_URL: http://consul:8500
+#      REG_SERVICE_NAME: auth
+#      REG_INSTANCE_NAME: internal
+#      REG_INSTANCE_ADDR: internal
+#      REG_INSTANCE_PORT: 8080
+#      REG_HEALTHCHECK_DEREGISTER_AFTER: "2m"
+#      REG_HEALTHCHECK_URL: "http://internal:8080/health"
+#      REG_HEALTHCHECK_INTERVAL: "10s"
+#    networks:
+#      micronet:
+
+  github:
+    image: j0rsa/gh-auth
+    environment:
+      JWT_SECRET: ghsecret
+      GH_CLIENT_ID: 1234rtg
+      GH_CLIENT_SECRET: 234ertd
+      GH_CODE_REDIRECT: "http://localhost:8080/auth/gh"
+    ports:
+      - 8080:8080
+    networks:
+      micronet:
+        aliases:
+          - github-oauth
+
+  github_registrar:
+    depends_on:
+      - consul
+    image: j0rsa/consul-registrar:latest
+    environment:
+      CONSUL_URL: http://consul:8500
+      REG_SERVICE_NAME: auth
+      REG_INSTANCE_NAME: github
+      REG_INSTANCE_ADDR: github-oauth
+      REG_INSTANCE_PORT: 8080
+      REG_INSTANCE_META: "provider=Github"
+      REG_INSTANCE_TAGS: "oauth"
+      REG_HEALTHCHECK_DEREGISTER_AFTER: "2m"
+      REG_HEALTHCHECK_URL: "http://github-oauth:8080/health"
+      REG_HEALTHCHECK_INTERVAL: "10s"
+    networks:
+      micronet:
+
+#  google:
+#    image: j0rsa/g-auth
+#    ports:
+#      - 8080:8080
+#    networks:
+#      micronet:
+#        aliases:
+#          - google-oauth
+
+  google_registrar:
+    depends_on:
+      - consul
+    image: j0rsa/consul-registrar:latest
+    environment:
+      CONSUL_URL: http://consul:8500
+      REG_SERVICE_NAME: auth
+      REG_INSTANCE_NAME: google
+      REG_INSTANCE_ADDR: github-oauth
+      REG_INSTANCE_PORT: 8080
+      REG_INSTANCE_META: "provider=Google"
+      REG_INSTANCE_TAGS: "oauth"
+      REG_HEALTHCHECK_DEREGISTER_AFTER: "2m"
+      REG_HEALTHCHECK_URL: "http://github-oauth:8080/health"
+      REG_HEALTHCHECK_INTERVAL: "10s"
+    networks:
+      micronet:
+
+networks:
+  public:
+    internal: false
+  micronet:
+    internal: true # switch to true when to public access to all services

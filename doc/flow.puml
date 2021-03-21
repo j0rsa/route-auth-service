@@ -1,0 +1,35 @@
+@startuml
+
+actor user
+component route as "Route auth service"
+component internal as "Internal\nauth module"
+component gh_oauth as "Github\nauth module"
+component g_oauth as "Google\nauth module""
+component consul as "Consul"
+
+boundary rinternal as "Internal\nconsul\nregistrar"
+boundary rgh_oauth as "Github\nconsul\nregistrar"
+boundary rg_oauth as "Google\nconsul\nregistrar"
+
+user -down-> route
+consul -[#green]> route
+internal - rinternal
+rinternal .[#green]. consul
+gh_oauth - rgh_oauth
+rgh_oauth .[#green]. consul
+g_oauth - rg_oauth
+rg_oauth .[#green]. consul
+
+route -down-> internal
+route -down-> gh_oauth
+route -down-> g_oauth
+
+database Db
+cloud Github as "Github API"
+cloud Google as "Google API"
+
+internal -down-> Db
+gh_oauth -down-> Github
+g_oauth -down-> Google
+
+@enduml
