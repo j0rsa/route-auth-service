@@ -6,7 +6,13 @@ This is a routing service to authenticate users via OAuth and use it as an authe
 
 ## Flow
 ![Flow diagram](doc/flow.png)
-[ref](https://docs.github.com/en/developers/apps/authorizing-oauth-apps)
+
+## Projects used
+
+- Inner auth: https://github.com/j0rsa/jwt-auth
+- Github oAuth: https://github.com/j0rsa/github-oauth-service
+- Google oAuth: https://github.com/j0rsa/google-oauth-service
+- Consul registrar: https://github.com/j0rsa/consul-registrar
 
 ## Endpoints
 | Method |     URL         | Description |
@@ -15,8 +21,8 @@ This is a routing service to authenticate users via OAuth and use it as an authe
 | `GET`  | `/health/{provider}`       | Dependant Healthcheck for auth service |
 | `GET`  | `/providers`    | Return registered providers |
 | `GET`  | `/auth/login/{provider}`   | Redirect to login page with required scopes for provided client id |
-| `POST` | `/auth/token/{provider}`   | Get JWT token by passing user code `{ "code": "<code>"}` after auth |
-| `GET`  | `/auth/check`   | Checks the token and returns code 200 with Headers: `X-Auth-Id` with user id, `X-Auth-User` with user name and `X-Github-Token` with github oauth user token |
+| `POST` | `/auth/token?provider={provider}`   | Get JWT token by passing user code `{ "code": "<code>"}` after auth |
+| `GET`  | `/auth/check`   | Checks the token and returns code 200 with Headers: `X-Auth-Id` with user id, `X-Auth-User` |
 | `POST` | `/auth/refresh` | Refresh token with a new one by passing the old valid one `{ "token": "eyJhbGciOiJIUz..." }` |
 
 ## Environment variables
